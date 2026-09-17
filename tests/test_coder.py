@@ -99,3 +99,23 @@ def test_coder_can_invoke_calculator():
     )
 
     assert result == "100"
+
+
+def test_coder_tool_invocation_returns_result():
+    from app.tools.registry import create_default_tool_registry
+
+    registry = create_default_tool_registry()
+
+    agent = CoderAgent(
+        ai_func=fake_ai,
+        tool_registry=registry,
+    )
+
+    result = agent.invoke_tool(
+        tool_name="calculator",
+        arguments={
+            "expression": "125 * 8",
+        },
+    )
+
+    assert result == "1000"

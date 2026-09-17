@@ -22,6 +22,16 @@ class CoderAgent(BaseAgent):
         self.ai_func = ai_func
         self.tool_registry = tool_registry
 
+    def invoke_tool(
+        self,
+        tool_name: str,
+        arguments: dict,
+    ):
+        return self.use_tool(
+            tool_name,
+            **arguments,
+        )
+
     def use_tool(self, tool_name: str, **kwargs):
         if self.tool_registry is None:
             raise RuntimeError("Tool registry is not configured")
