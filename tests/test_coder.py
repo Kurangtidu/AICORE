@@ -52,3 +52,50 @@ def test_coder_uses_research_result():
     assert "LangGraph menggunakan StateGraph untuk workflow agent." in (
         captured_prompt["value"]
     )
+
+
+def test_coder_receives_tool_registry():
+    from app.tools.registry import create_default_tool_registry
+
+    registry = create_default_tool_registry()
+    agent = CoderAgent(
+        ai_func=fake_ai,
+        tool_registry=registry,
+    )
+
+    assert agent.tool_registry is registry
+
+
+def test_coder_can_use_calculator_tool():
+    from app.tools.registry import create_default_tool_registry
+
+    registry = create_default_tool_registry()
+
+    agent = CoderAgent(
+        ai_func=fake_ai,
+        tool_registry=registry,
+    )
+
+    result = agent.tool_registry.get("calculator").run(
+        expression="10 * 5"
+    )
+
+    assert result == "50"
+
+
+def test_coder_can_invoke_calculator():
+    from app.tools.registry import create_default_tool_registry
+
+    registry = create_default_tool_registry()
+
+    agent = CoderAgent(
+        ai_func=fake_ai,
+        tool_registry=registry,
+    )
+
+    result = agent.use_tool(
+        "calculator",
+        expression="25 * 4",
+    )
+
+    assert result == "100"

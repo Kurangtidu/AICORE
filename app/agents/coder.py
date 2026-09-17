@@ -8,13 +8,26 @@ from app.core.execution import (
 )
 from app.core.llm import ask_ai
 from app.models.state import AIState
+from app.tools.registry import ToolRegistry
 
 
 class CoderAgent(BaseAgent):
     name = "coder"
 
-    def __init__(self, ai_func: Callable[[str], str] = ask_ai):
+    def __init__(
+        self,
+        ai_func: Callable[[str], str] = ask_ai,
+        tool_registry: ToolRegistry | None = None,
+    ):
         self.ai_func = ai_func
+        self.tool_registry = tool_registry
+
+    def use_tool(self, tool_name: str, **kwargs):
+        if self.tool_registry is None:
+            raise RuntimeError("Tool registry is not configured")
+
+        tool = self.tool_registry.get(tool_name)
+        return tool.run(**kwargs)
 
     def run(self, state: AIState) -> AIState:
         start_agent(state, self.name)
