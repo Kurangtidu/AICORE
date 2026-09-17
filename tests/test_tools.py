@@ -59,3 +59,12 @@ def test_calculator_blocks_unsafe_expression():
     result = tool.run("__import__('os').system('echo hacked')")
 
     assert result.startswith("Calculation error:")
+
+
+def test_default_tool_registry():
+    from app.tools.registry import create_default_tool_registry
+
+    registry = create_default_tool_registry()
+
+    assert registry.list_tools() == ["calculator"]
+    assert registry.get("calculator").name == "calculator"

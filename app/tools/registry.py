@@ -1,4 +1,5 @@
 from app.tools.base import BaseTool
+from app.tools.calculator import CalculatorTool
 
 
 class ToolRegistry:
@@ -16,3 +17,11 @@ class ToolRegistry:
 
     def list_tools(self) -> list[str]:
         return list(self._tools.keys())
+
+
+def create_default_tool_registry() -> ToolRegistry:
+    registry = ToolRegistry()
+
+    registry.register(CalculatorTool())
+
+    return registry
