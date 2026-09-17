@@ -28,3 +28,10 @@ def test_router_research_task():
     }
 
     assert router.route(state) == "researcher"
+
+def test_router_detect_intent():
+    router = Router()
+
+    assert router.detect_intent("Buat rencana belajar Python") == "planning"
+    assert router.detect_intent("Riset tentang LangGraph") == "research"
+    assert router.detect_intent("Halo, apa kabar?") == "fallback"

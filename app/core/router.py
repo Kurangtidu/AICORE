@@ -3,23 +3,16 @@ from app.models.state import AIState
 
 class Router:
 
-    def route(self, state: AIState) -> str:
+    def detect_intent(self, task: str) -> str:
         """
-        Determine which registered agent should handle the task.
+        Detect the user's intent using deterministic rules.
 
-        V1 uses deterministic keyword-based routing.
-        Planner is the default fallback.
+        V1 supports:
+        - planning
+        - research
+        - fallback
         """
-        task = state.get("task", "").lower()
-
-        planning_keywords = [
-            "rencana",
-            "planning",
-            "plan",
-            "langkah",
-            "strategi",
-            "belajar",
-        ]
+        task = task.lower()
 
         research_keywords = [
             "riset",
@@ -30,10 +23,33 @@ class Router:
             "referensi",
         ]
 
+        planning_keywords = [
+            "rencana",
+            "planning",
+            "plan",
+            "langkah",
+            "strategi",
+            "belajar",
+        ]
+
         if any(keyword in task for keyword in research_keywords):
-            return "researcher"
+            return "research"
 
         if any(keyword in task for keyword in planning_keywords):
+            return "planning"
+
+        return "fallback"
+
+    def route(self, state: AIState) -> str:
+        """
+        Map detected intent to a registered agent.
+        """
+        intent = self.detect_intent(state.get("task", ""))
+
+        if intent == "research":
+            return "researcher"
+
+        if intent == "planning":
             return "planner"
 
         return "planner"
