@@ -1,4 +1,5 @@
 from app.agents.registry import AgentRegistry
+from app.core.router import Router
 from app.memory.manager import MemoryManager
 from app.models.state import AIState
 
@@ -9,18 +10,17 @@ class Orchestrator:
         self,
         registry: AgentRegistry,
         memory: MemoryManager,
+        router: Router | None = None,
     ):
         self.registry = registry
         self.memory = memory
+        self.router = router or Router()
 
     def route(self, state: AIState) -> str:
         """
         Determine which agent should handle the task.
-
-        V1 uses a deterministic planner route.
-        Future versions can use an AI-powered router.
         """
-        return "planner"
+        return self.router.route(state)
 
     def run(self, state: AIState) -> AIState:
         agent_name = self.route(state)
