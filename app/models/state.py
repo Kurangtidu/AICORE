@@ -7,6 +7,6 @@ class AIState(TypedDict, total=False):
     research: str
     response: str
     current_agent: str
+    memory: Any
     messages: list[dict[str, Any]]
     metadata: dict[str, Any]
-    memory: Any
