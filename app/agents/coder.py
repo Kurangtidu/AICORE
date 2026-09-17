@@ -14,6 +14,7 @@ class CoderAgent(BaseAgent):
     def run(self, state: AIState) -> AIState:
         task = state["task"]
         memory = state.get("memory")
+        research = state.get("research")
 
         previous_code = None
 
@@ -29,6 +30,15 @@ Previous coding result exists in memory:
 {previous_code}
 
 Improve or adapt it when useful.
+"""
+
+        if research:
+            context += f"""
+Research result from the Researcher Agent:
+
+{research}
+
+Use this research as context when implementing the solution.
 """
 
         prompt = f"""

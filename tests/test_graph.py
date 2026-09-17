@@ -1,17 +1,23 @@
-from app.agents.planner import PlannerAgent
+from app.agents.coder import CoderAgent
 from app.agents.registry import AgentRegistry
+from app.agents.researcher import ResearchAgent
 from app.core.graph import build_graph
 from app.memory.local import LocalMemory
 from app.memory.manager import MemoryManager
+from app.models.state import AIState
 
 
-def fake_ai(prompt: str) -> str:
-    return "1. Pelajari Python\n2. Latihan coding\n3. Buat proyek"
+def test_research_to_coder_workflow():
+    def fake_research(prompt: str) -> str:
+        return "Hasil riset: gunakan StateGraph untuk workflow."
 
+    def fake_coder(prompt: str) -> str:
+        assert "Hasil riset: gunakan StateGraph untuk workflow." in prompt
+        return "Kode dibuat berdasarkan hasil riset."
 
-def test_ai_core_graph():
     registry = AgentRegistry()
-    registry.register(PlannerAgent(ai_func=fake_ai))
+    registry.register(ResearchAgent(ai_func=fake_research))
+    registry.register(CoderAgent(ai_func=fake_coder))
 
     memory = MemoryManager(LocalMemory())
 
@@ -20,15 +26,19 @@ def test_ai_core_graph():
         memory=memory,
     )
 
-    result = graph.invoke({
-        "task": "Buat rencana belajar Python untuk pemula",
+    state: AIState = {
+        "task": "Riset lalu buat kode tentang LangGraph",
         "response": "",
         "current_agent": "",
         "messages": [],
         "metadata": {},
-    })
+    }
 
-    assert result["current_agent"] == "planner"
-    assert result["response"]
-    assert len(result["messages"]) == 1
-    assert result["messages"][0]["agent"] == "planner"
+    result = graph.invoke(state)
+
+    assert result["research"] == (
+        "Hasil riset: gunakan StateGraph untuk workflow."
+    )
+    assert result["response"] == (
+    "Kode dibuat berdasarkan hasil riset."
+)

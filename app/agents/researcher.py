@@ -47,7 +47,7 @@ Return a concise, structured research result.
 
         state["current_agent"] = self.name
         state["response"] = result
-
+        state["research"] = result
         state["messages"].append({
             "agent": self.name,
             "content": result,

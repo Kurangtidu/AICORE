@@ -25,3 +25,21 @@ def test_researcher_agent():
     )
     assert len(result["messages"]) == 1
     assert result["messages"][0]["agent"] == "researcher"
+
+def test_researcher_stores_research_in_state():
+    def fake_ai(prompt: str) -> str:
+        return "Hasil riset LangGraph."
+
+    agent = ResearchAgent(ai_func=fake_ai)
+
+    state: AIState = {
+        "task": "Riset tentang LangGraph",
+        "response": "",
+        "current_agent": "",
+        "messages": [],
+        "metadata": {},
+    }
+
+    result = agent.run(state)
+
+    assert result["research"] == "Hasil riset LangGraph."
