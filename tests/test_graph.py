@@ -79,3 +79,16 @@ def test_execution_history():
 
     assert result["status"] == "completed"
     assert result["current_agent"] == "coder"
+
+
+def test_graph_accepts_tool_registry():
+    from app.core.graph import build_graph
+    from app.tools.registry import create_default_tool_registry
+
+    tool_registry = create_default_tool_registry()
+
+    graph = build_graph(
+        tool_registry=tool_registry,
+    )
+
+    assert graph is not None

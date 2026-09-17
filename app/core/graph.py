@@ -5,11 +5,16 @@ from app.core.router import Router
 from app.memory.supabase import SupabaseMemory
 from app.memory.manager import MemoryManager
 from app.models.state import AIState
+from app.tools.registry import (
+    ToolRegistry,
+    create_default_tool_registry,
+)
 
 
 def build_graph(
     registry: AgentRegistry | None = None,
     memory: MemoryManager | None = None,
+    tool_registry: ToolRegistry | None = None,
 ):
     if registry is None:
         registry = create_default_registry()
@@ -17,6 +22,9 @@ def build_graph(
     if memory is None:
         memory_store = SupabaseMemory()
         memory = MemoryManager(memory_store)
+
+    if tool_registry is None:
+        tool_registry = create_default_tool_registry()
 
     router = Router()
 
@@ -69,6 +77,7 @@ def build_graph(
     def coder_node(state: AIState) -> AIState:
         state["memory"] = memory
         agent = registry.get("coder")
+        agent.tool_registry = tool_registry
         return agent.run(state)
 
     def planner_node(state: AIState) -> AIState:
