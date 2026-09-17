@@ -1,4 +1,4 @@
-
+from app.agents.coder import CoderAgent
 from app.agents.base import BaseAgent
 from app.agents.planner import PlannerAgent
 from app.agents.researcher import ResearchAgent
@@ -26,5 +26,14 @@ def create_default_registry() -> AgentRegistry:
 
     registry.register(PlannerAgent())
     registry.register(ResearchAgent())
+
+    return registry
+
+def create_default_registry() -> AgentRegistry:
+    registry = AgentRegistry()
+
+    registry.register(PlannerAgent())
+    registry.register(ResearchAgent())
+    registry.register(CoderAgent())
 
     return registry

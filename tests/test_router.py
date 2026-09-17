@@ -35,3 +35,12 @@ def test_router_detect_intent():
     assert router.detect_intent("Buat rencana belajar Python") == "planning"
     assert router.detect_intent("Riset tentang LangGraph") == "research"
     assert router.detect_intent("Halo, apa kabar?") == "fallback"
+
+def test_router_coding_task():
+    router = Router()
+
+    state = {
+        "task": "Buat kode Python untuk menghitung faktorial",
+    }
+
+    assert router.route(state) == "coder"

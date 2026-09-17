@@ -5,14 +5,37 @@ class Router:
 
     def detect_intent(self, task: str) -> str:
         """
+        if any(keyword in task for keyword in research_keywords):
+            return "research"
+
+        if any(keyword in task for keyword in planning_keywords):
+            return "planning"
+
+        if any(keyword in task for keyword in coding_keywords):
+            return "coding"
+
+        return "fallback"
+
         Detect the user's intent using deterministic rules.
 
         V1 supports:
-        - planning
+        - coding
         - research
+        - planning
         - fallback
         """
         task = task.lower()
+
+        coding_keywords = [
+            "kode",
+            "coding",
+            "program",
+            "programming",
+            "buatkan code",
+            "buat kode",
+            "debug",
+            "perbaiki code",
+        ]
 
         research_keywords = [
             "riset",
@@ -32,6 +55,9 @@ class Router:
             "belajar",
         ]
 
+        if any(keyword in task for keyword in coding_keywords):
+            return "coding"
+
         if any(keyword in task for keyword in research_keywords):
             return "research"
 
@@ -45,6 +71,9 @@ class Router:
         Map detected intent to a registered agent.
         """
         intent = self.detect_intent(state.get("task", ""))
+
+        if intent == "coding":
+            return "coder"
 
         if intent == "research":
             return "researcher"

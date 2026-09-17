@@ -87,3 +87,43 @@ def test_orchestrator_routes_to_researcher():
     assert result["memory"].get("research:last_result") == (
         "Hasil riset tentang LangGraph."
     )
+
+def test_orchestrator_routes_to_coder():
+    from app.agents.coder import CoderAgent
+    from app.core.router import Router
+    from app.memory.local import LocalMemory
+    from app.memory.manager import MemoryManager
+
+    def fake_ai(prompt: str) -> str:
+        return "def hello():\n    return 'Hello World'"
+
+    registry = AgentRegistry()
+    registry.register(CoderAgent(ai_func=fake_ai))
+
+    memory = MemoryManager(LocalMemory())
+
+    orchestrator = Orchestrator(
+        registry=registry,
+        memory=memory,
+        router=Router(),
+    )
+
+    state = {
+        "task": "Buat kode Python sederhana",
+        "response": "",
+        "current_agent": "",
+        "messages": [],
+        "metadata": {},
+    }
+
+    result = orchestrator.run(state)
+
+    assert result["current_agent"] == "coder"
+    assert result["response"] == (
+        "def hello():\n"
+        "    return 'Hello World'"
+    )
+    assert result["memory"].get("coder:last_result") == (
+        "def hello():\n"
+        "    return 'Hello World'"
+    )
