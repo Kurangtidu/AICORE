@@ -29,3 +29,33 @@ def test_tool_registry_missing_tool():
         assert False, "Seharusnya ToolRegistry gagal"
     except KeyError as exc:
         assert "Tool not registered" in str(exc)
+
+
+def test_calculator_tool():
+    from app.tools.calculator import CalculatorTool
+
+    tool = CalculatorTool()
+
+    assert tool.run("2 + 3") == "5"
+    assert tool.run("10 * 5") == "50"
+    assert tool.run("100 / 4") == "25.0"
+
+
+def test_calculator_invalid_expression():
+    from app.tools.calculator import CalculatorTool
+
+    tool = CalculatorTool()
+
+    result = tool.run("invalid expression")
+
+    assert result.startswith("Calculation error:")
+
+
+def test_calculator_blocks_unsafe_expression():
+    from app.tools.calculator import CalculatorTool
+
+    tool = CalculatorTool()
+
+    result = tool.run("__import__('os').system('echo hacked')")
+
+    assert result.startswith("Calculation error:")
