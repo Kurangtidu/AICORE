@@ -68,3 +68,53 @@ def test_fail_agent_records_error():
     assert state["current_agent"] == "researcher"
     assert state["status"] == "failed"
     assert state["error"] == "Research failed"
+
+
+def test_researcher_failure_tracking():
+    from app.agents.researcher import ResearchAgent
+
+    def failing_ai(prompt: str) -> str:
+        raise RuntimeError("Research failed")
+
+    agent = ResearchAgent(ai_func=failing_ai)
+
+    state = {
+        "task": "Riset sesuatu",
+        "messages": [],
+        "agent_history": [],
+    }
+
+    try:
+        agent.run(state)
+        assert False, "ResearchAgent seharusnya gagal"
+    except RuntimeError as exc:
+        assert str(exc) == "Research failed"
+
+    assert state["status"] == "failed"
+    assert state["error"] == "Research failed"
+    assert state["current_agent"] == "researcher"
+
+
+def test_coder_failure_tracking():
+    from app.agents.coder import CoderAgent
+
+    def failing_ai(prompt: str) -> str:
+        raise RuntimeError("Coding failed")
+
+    agent = CoderAgent(ai_func=failing_ai)
+
+    state = {
+        "task": "Buat kode",
+        "messages": [],
+        "agent_history": [],
+    }
+
+    try:
+        agent.run(state)
+        assert False, "CoderAgent seharusnya gagal"
+    except RuntimeError as exc:
+        assert str(exc) == "Coding failed"
+
+    assert state["status"] == "failed"
+    assert state["error"] == "Coding failed"
+    assert state["current_agent"] == "coder"
