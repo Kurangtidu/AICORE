@@ -27,3 +27,28 @@ def test_planner_agent():
     )
     assert len(result["messages"]) == 1
     assert result["messages"][0]["agent"] == "planner"
+
+def test_planner_failure_tracking():
+    def failing_ai(prompt: str) -> str:
+        raise RuntimeError("LLM unavailable")
+
+    agent = PlannerAgent(ai_func=failing_ai)
+
+    state: AIState = {
+        "task": "Buat rencana belajar Python",
+        "response": "",
+        "current_agent": "",
+        "messages": [],
+        "metadata": {},
+    }
+
+    try:
+        agent.run(state)
+        assert False, "PlannerAgent seharusnya gagal"
+    except RuntimeError as exc:
+        assert str(exc) == "LLM unavailable"
+
+    assert state["current_agent"] == "planner"
+    assert state["status"] == "failed"
+    assert state["error"] == "LLM unavailable"
+    assert state["agent_history"] == ["planner"]
