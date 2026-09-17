@@ -1,6 +1,11 @@
 from collections.abc import Callable
 
 from app.agents.base import BaseAgent
+from app.core.execution import (
+    fail_agent,
+    finish_agent,
+    start_agent,
+)
 from app.core.llm import ask_ai
 from app.models.state import AIState
 
@@ -12,18 +17,21 @@ class ResearchAgent(BaseAgent):
         self.ai_func = ai_func
 
     def run(self, state: AIState) -> AIState:
-        task = state["task"]
-        memory = state.get("memory")
+        start_agent(state, self.name)
 
-        previous_research = None
+        try:
+            task = state["task"]
+            memory = state.get("memory")
 
-        if memory is not None:
-            previous_research = memory.get("research:last_result")
+            previous_research = None
 
-        context = ""
+            if memory is not None:
+                previous_research = memory.get("research:last_result")
 
-        if previous_research:
-            context = f"""
+            context = ""
+
+            if previous_research:
+                context = f"""
 Previous research exists in memory:
 
 {previous_research}
@@ -31,7 +39,7 @@ Previous research exists in memory:
 Use it as context and improve or update it when useful.
 """
 
-        prompt = f"""
+            prompt = f"""
 You are the Research Agent of an AI orchestration system.
 
 Research and explain the following topic clearly and accurately:
@@ -43,17 +51,28 @@ Research and explain the following topic clearly and accurately:
 Return a concise, structured research result.
 """
 
-        result = self.ai_func(prompt)
+            result = self.ai_func(prompt)
 
-        state["current_agent"] = self.name
-        state["response"] = result
-        state["research"] = result
-        state["messages"].append({
-            "agent": self.name,
-            "content": result,
-        })
+            state["current_agent"] = self.name
+            state["response"] = result
+            state["research"] = result
 
-        if memory is not None:
-            memory.save("research:last_result", result)
+            state["messages"].append({
+                "agent": self.name,
+                "content": result,
+            })
 
-        return state
+            if memory is not None:
+                memory.save("research:last_result", result)
+
+            finish_agent(state, self.name)
+
+            return state
+
+        except Exception as exc:
+            fail_agent(
+                state,
+                self.name,
+                str(exc),
+            )
+            raise
