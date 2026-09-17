@@ -19,3 +19,12 @@ def test_router_fallback():
     }
 
     assert router.route(state) == "planner"
+
+def test_router_research_task():
+    router = Router()
+
+    state = {
+        "task": "Riset tentang LangGraph",
+    }
+
+    assert router.route(state) == "researcher"

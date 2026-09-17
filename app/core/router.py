@@ -7,8 +7,8 @@ class Router:
         """
         Determine which registered agent should handle the task.
 
-        V1 uses deterministic routing.
-        Planner is the default fallback until more agents are added.
+        V1 uses deterministic keyword-based routing.
+        Planner is the default fallback.
         """
         task = state.get("task", "").lower()
 
@@ -20,6 +20,18 @@ class Router:
             "strategi",
             "belajar",
         ]
+
+        research_keywords = [
+            "riset",
+            "research",
+            "cari tahu",
+            "penelitian",
+            "sumber",
+            "referensi",
+        ]
+
+        if any(keyword in task for keyword in research_keywords):
+            return "researcher"
 
         if any(keyword in task for keyword in planning_keywords):
             return "planner"
