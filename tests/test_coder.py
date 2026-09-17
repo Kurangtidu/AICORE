@@ -119,3 +119,37 @@ def test_coder_tool_invocation_returns_result():
     )
 
     assert result == "1000"
+
+
+def test_coder_can_decide_to_use_tool():
+    from app.tools.registry import create_default_tool_registry
+
+    registry = create_default_tool_registry()
+
+    agent = CoderAgent(
+        ai_func=fake_ai,
+        tool_registry=registry,
+    )
+
+    decision = agent.should_use_tool(
+        "Hitung 125 * 8 menggunakan calculator"
+    )
+
+    assert decision is True
+
+
+def test_coder_can_decide_not_to_use_tool():
+    from app.tools.registry import create_default_tool_registry
+
+    registry = create_default_tool_registry()
+
+    agent = CoderAgent(
+        ai_func=fake_ai,
+        tool_registry=registry,
+    )
+
+    decision = agent.should_use_tool(
+        "Buat fungsi Python untuk mencetak Hello World"
+    )
+
+    assert decision is False

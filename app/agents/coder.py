@@ -22,6 +22,25 @@ class CoderAgent(BaseAgent):
         self.ai_func = ai_func
         self.tool_registry = tool_registry
 
+    def should_use_tool(self, task: str) -> bool:
+        if self.tool_registry is None:
+            return False
+
+        calculator_keywords = [
+            "hitung",
+            "calculate",
+            "calculator",
+            "perhitungan",
+            "berapa hasil",
+        ]
+
+        task_lower = task.lower()
+
+        return any(
+            keyword in task_lower
+            for keyword in calculator_keywords
+        )
+
     def invoke_tool(
         self,
         tool_name: str,
